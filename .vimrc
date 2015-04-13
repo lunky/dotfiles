@@ -8,7 +8,6 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 
 	syntax on				" Switch on syntax highlighting.
 	
-	let c_comment_strings=1 " highlight C-style comments
 
 	set mousehide			" Hide the mouse pointer while typing
 	set nocompatible		" Don't try to be VI
@@ -42,6 +41,7 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 	highlight StatusLine    guifg=Red  guibg=White ctermfg=Red   ctermbg=White
 	highlight StatusLineNC guifg=Green guibg=Black ctermfg=Green ctermbg=Black
 	highlight Search guifg=Black guibg=Yellow ctermfg=Black ctermbg=Yellow
+	highlight Comment ctermfg=blue
 
 
 	" Make shift-insert work like in Xterm

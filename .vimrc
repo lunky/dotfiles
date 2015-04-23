@@ -48,6 +48,7 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 	map <S-Insert> <MiddleMouse>
 	map! <S-Insert> <MiddleMouse>
 
+	set writebackup
 	"---------------------------------------------------------------------------
 	" Win32 - put Win32 specific "stuff" here.
 	"---------------------------------------------------------------------------
@@ -58,16 +59,17 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 		set dir=>c:\\temp\\ 	" temp directory, defaults to \temp I think
 		set backupdir=>c:\\temp\\ 	" same as directory
 		set shell=bash 			" for commands like "make" and "shell"
+	else
+		" This looks nices where ever I run unix'ish OS's
+"		set guifont=-adobe-courier-medium-r-normal--12-120-75-75-m-70-iso8859-1
+		set backupdir=~/.tmp
+		set dir=~/.tmp
 	endif
-	set nowritebackup
 
 	"---------------------------------------------------------------------------
 	" unix - put the un*x specific "stuff" here
 	"---------------------------------------------------------------------------
 	if has("unix")
-		" This looks nices where ever I run unix'ish OS's
-"		set guifont=-adobe-courier-medium-r-normal--12-120-75-75-m-70-iso8859-1
-		set writebackup
 	endif
 " got the next couple of lines from the vim mailing group c/o
 " :Freddy Vulto <fvu@fvu.myweb.nl>
@@ -101,4 +103,4 @@ if &term =~ '^xterm'
   " 5 -> blinking vertical bar
   " 6 -> solid vertical bar
 endif
-
+set term=screen-256color

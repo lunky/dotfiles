@@ -20,6 +20,9 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 	set hlsearch			" Switch on search pattern highlighting.
 	set visualbell			" turns off the mind bending 'binging'
 
+	autocmd Filetype ruby setlocal ts=2 sts=2 sw=2 expandtab
+	autocmd Filetype coffee setlocal ts=2 sts=2 sw=2 expandtab
+	autocmd Filetype haml setlocal ts=2 sts=2 sw=2 expandtab
 	set shellpipe="|& tee "
 "	set makeef=c:\\tmp\\vim##.err
 	if has("gui_running")
@@ -29,6 +32,8 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 		nmap <C-S-V> "+gP
 		imap <C-S-V> <ESC><C-S-V>a
 		vmap <C-S-C> "+y
+	else
+		set term=screen-256color
 	endif
 
 
@@ -42,7 +47,9 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 	highlight StatusLineNC guifg=Green guibg=Black ctermfg=Green ctermbg=Black
 	highlight Search guifg=Black guibg=Yellow ctermfg=Black ctermbg=Yellow
 	highlight Comment ctermfg=blue
-
+	if has("gui_running")
+		colorscheme darkblue
+	endif
 
 	" Make shift-insert work like in Xterm
 	map <S-Insert> <MiddleMouse>
@@ -103,4 +110,39 @@ if &term =~ '^xterm'
   " 5 -> blinking vertical bar
   " 6 -> solid vertical bar
 endif
-set term=screen-256color
+
+" Shortcut to rapidly toggle `set list`
+   nmap <leader>l :set list!<CR>
+
+" Use the same symbols as TextMate for tabstops and EOLs
+set listchars=tab:▸\ ,eol:¬
+
+" Set tabstop, softtabstop and shiftwidth to the same value
+command! -nargs=* Stab call Stab()
+function! Stab()
+  let l:tabstop = 1 * input('set tabstop = softtabstop = shiftwidth = ')
+  if l:tabstop > 0
+    let &l:sts = l:tabstop
+    let &l:ts = l:tabstop
+    let &l:sw = l:tabstop
+  endif
+  call SummarizeTabs()
+endfunction
+
+function! SummarizeTabs()
+  try
+    echohl ModeMsg
+    echon 'tabstop='.&l:ts
+    echon ' shiftwidth='.&l:sw
+    echon ' softtabstop='.&l:sts
+    if &l:et
+      echon ' expandtab'
+    else
+      echon ' noexpandtab'
+    endif
+  finally
+    echohl None
+  endtry
+endfunction
+
+execute pathogen#infect()

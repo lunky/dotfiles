@@ -23,8 +23,8 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 	autocmd Filetype ruby setlocal ts=2 sts=2 sw=2 expandtab
 	autocmd Filetype coffee setlocal ts=2 sts=2 sw=2 expandtab
 	autocmd Filetype haml setlocal ts=2 sts=2 sw=2 expandtab
+	autocmd Filetype elm setlocal ts=2 sts=2 sw=2 expandtab
 	set shellpipe="|& tee "
-"	set makeef=c:\\tmp\\vim##.err
 	if has("gui_running")
 		set lines=40
 		set columns=195
@@ -32,9 +32,8 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 		nmap <C-S-V> "+gP
 		imap <C-S-V> <ESC><C-S-V>a
 		vmap <C-S-C> "+y
-	else
-		set term=screen-256color
 	endif
+
 
 
 	highlight Normal     guibg=grey90  guifg=Black   term=NONE
@@ -49,11 +48,19 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 	highlight Comment ctermfg=blue
 	if has("gui_running")
 		colorscheme darkblue
+		" hide the toolbar
+		set guioptions-=T
+	else
+		colorscheme slate
+		"set term=screen-256color
 	endif
 
 	" Make shift-insert work like in Xterm
 	map <S-Insert> <MiddleMouse>
 	map! <S-Insert> <MiddleMouse>
+
+	" Map Ctrl-W to leader w 
+	nnoremap <Leader>w <C-w>
 
 	set writebackup
 	"---------------------------------------------------------------------------
@@ -66,6 +73,9 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 		set dir=>c:\\temp\\ 	" temp directory, defaults to \temp I think
 		set backupdir=>c:\\temp\\ 	" same as directory
 		set shell=bash 			" for commands like "make" and "shell"
+
+		source $VIMRUNTIME/mswin.vim
+		behave mswin
 	else
 		" This looks nices where ever I run unix'ish OS's
 "		set guifont=-adobe-courier-medium-r-normal--12-120-75-75-m-70-iso8859-1
@@ -93,7 +103,7 @@ endif
 
 "set writebackup
 " Sourse the .exrc "Mappings"
-:source ~/.exrc
+" :source ~/.exrc
 set nowrap
 set runtimepath^=~/.vim/bundle/node
 set runtimepath^=~/.vim/bundle/vim-nodejs-errorformat
@@ -115,7 +125,8 @@ endif
    nmap <leader>l :set list!<CR>
 
 " Use the same symbols as TextMate for tabstops and EOLs
-set listchars=tab:▸\ ,eol:¬
+set listchars=tab:?\ ,eol:�
+
 
 " Set tabstop, softtabstop and shiftwidth to the same value
 command! -nargs=* Stab call Stab()

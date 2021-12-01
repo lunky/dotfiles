@@ -18,24 +18,29 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
     set ruler               " This is the cursor location in statusbar
     set ignorecase          " Ignores case in text searches
     set hlsearch            " Switch on search pattern highlighting.
+    set incsearch           " Highlight search as you type
     set visualbell          " turns off the mind bending 'binging'
 
     autocmd Filetype ruby setlocal ts=2 sts=2 sw=2 expandtab
     autocmd Filetype coffee setlocal ts=2 sts=2 sw=2 expandtab
     autocmd Filetype haml setlocal ts=2 sts=2 sw=2 expandtab
     autocmd Filetype elm setlocal ts=2 sts=2 sw=2 expandtab
+    autocmd Filetype haskell setlocal ts=2 sts=2 sw=2 expandtab  commentstring=--\ %s
+    autocmd Filetype python setlocal ts=2 sts=2 sw=2 expandtab
     autocmd FileType javascript setlocal commentstring=//\ %s
+
+    autocmd FileType typescript setlocal formatprg=prettier\ --parser\ typescript
     
     set expandtab " lets just make this the default
 
-    set shellpipe="|& tee "
+    nmap <C-S-V> "+gP
+    imap <C-S-V> <ESC><C-S-V>a
+    vmap <C-S-C> "+y
+"    set shellpipe="|& tee "
     if has("gui_running")
         set lines=40
         set columns=195
 
-        nmap <C-S-V> "+gP
-        imap <C-S-V> <ESC><C-S-V>a
-        vmap <C-S-C> "+y
     else
         "set term=screen-256color
         set mouse=a
@@ -57,19 +62,37 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
         colorscheme darkblue
         " hide the toolbar
         set guioptions-=T
+        " Make shift-insert work like in Xterm
+        map <S-Insert> <MiddleMouse>
+        map! <S-Insert> <MiddleMouse>
+
+        nmap <S-Insert> "+gP
+        imap <S-Insert> <ESC><C-S-V>a
+        vmap <C-Insert> "+y
+    else
+        " Make shift-insert work like in Xterm
+        map <S-Insert> <MiddleMouse>
+        map! <S-Insert> <MiddleMouse>
+
+        nmap <S-Insert> "*p
+        imap <S-Insert> <ESC><C-S-V>a
+        vmap <C-Insert> "*y
+
     endif
 
-    " Make shift-insert work like in Xterm
-    map <S-Insert> <MiddleMouse>
-    map! <S-Insert> <MiddleMouse>
-
-    nmap <S-Insert> "+gP
-    imap <S-Insert> <ESC><C-S-V>a
-    vmap <C-Insert> "+y
 
     " Map Ctrl-W to leader w 
     nnoremap <Leader>w <C-w>
     noremap <Leader>- :Commentary<cr>
+
+    " Map Ctrl-S to save
+    "noremap <silent> <C-S>          :update<CR>
+    "vnoremap <silent> <C-S>         <C-C>:update<CR>
+    "inoremap <silent> <C-S>         <C-O>:update<CR>
+
+    noremap <C-S>          :update<CR>
+    vnoremap <C-S>         <C-C>:update<CR>
+    inoremap <C-S>         <C-O>:update<CR>
 
     set writebackup
     "---------------------------------------------------------------------------
@@ -101,10 +124,10 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 " :Freddy Vulto <fvu@fvu.myweb.nl>
 "   set shell=D:\\Programs\\DjGpp\\bash.bat
 "set shell=c:\\programs\\cygwin\\bash.bat
-   set shellcmdflag=-c
-"   set shellredir=>%s\ 2>&1
-   set shellredir=">%s 2>&1"
-   set shellxquote=\"
+"   set shellcmdflag=-c
+""   set shellredir=>%s\ 2>&1
+"   set shellredir=">%s 2>&1"
+"   set shellxquote=\"
    set ssl
 
 
@@ -120,21 +143,38 @@ set runtimepath^=~/.vim/bundle/vim-nodejs-errorformat
 set number " line numbers
 if &term =~ '^xterm'
   " solid underscore
-  let &t_SI .= "\<Esc>[4 q"
+  let &t_SI .= "\<Esc>[5 q"
   " solid block
-  let &t_EI .= "\<Esc>[2 q"
+  let &t_EI .= "\<Esc>[1 q"
   " 1 or 0 -> blinking block
   " 3 -> blinking underscore
   " Recent versions of xterm (282 or above) also support
   " 5 -> blinking vertical bar
   " 6 -> solid vertical bar
+  "autocmd VimLeave * silent !echo -ne "\033[0 q"
 endif
+
+if &term =~ '^xterm'
+    " normal mode
+    let &t_EI .= "\<Esc>[0 q"
+    " insert mode
+    let &t_SI .= "\<Esc>[5 q"
+endif
+
+
+if exists('$TMUX')
+"    " tmux will only forward escape sequences to the terminal if surrounded by a DCS sequence
+   let &t_SI .= "\<Esc>Ptmux;\<Esc>\<Esc>[5 q\<Esc>\\"
+   let &t_EI .= "\<Esc>Ptmux;\<Esc>\<Esc>[0 q\<Esc>\\"
+   autocmd VimLeave * silent !echo -ne "\033Ptmux;\033\033[0 q\033\\"
+endi
 
 " Shortcut to rapidly toggle `set list`
    nmap <leader>l :set list!<CR>
 
 " Use the same symbols as TextMate for tabstops and EOLs
 set listchars=tab:?\ ,eol:¬
+set lcs+=space:· " works with listchars
 
 
 " Set tabstop, softtabstop and shiftwidth to the same value
@@ -164,5 +204,8 @@ function! SummarizeTabs()
     echohl None
   endtry
 endfunction
-
 execute pathogen#infect()
+
+"    Leader-to - Apply one hint at cursor position
+"    Leader-ta - Apply all suggestions in the file
+

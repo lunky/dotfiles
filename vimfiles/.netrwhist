@@ -1,0 +1,9 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =7
+let g:netrw_dirhist_1='/home/quinn/devel/tmp/kata'
+let g:netrw_dirhist_2='/home/quinn/devel/tmp'
+let g:netrw_dirhist_3='/home/quinn/devel'
+let g:netrw_dirhist_4='/home/quinn/devel/ByTheNumbers'
+let g:netrw_dirhist_5='/home/quinn/devel/ByTheNumbers/src'
+let g:netrw_dirhist_6='/home/quinn/devel/euler/src'
+let g:netrw_dirhist_7='C:/Code/ClearMeasure/Marlette/NServiceQueueMonitor/src/test/java/com/marlette/services'

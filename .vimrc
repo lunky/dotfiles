@@ -204,6 +204,7 @@ function! SummarizeTabs()
     echohl None
   endtry
 endfunction
+
 execute pathogen#infect()
 
 "    Leader-to - Apply one hint at cursor position

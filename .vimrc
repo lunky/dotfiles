@@ -176,6 +176,10 @@ endi
 set listchars=tab:?\ ,eol:�
 set lcs+=space:� " works with listchars
 
+" testing
+set encoding=utf-8
+set listchars=tab:▸\ ,eol:¬,space:·,trail:·
+
 
 " Set tabstop, softtabstop and shiftwidth to the same value
 command! -nargs=* Stab call Stab()
@@ -204,7 +208,6 @@ function! SummarizeTabs()
     echohl None
   endtry
 endfunction
-
 execute pathogen#infect()
 
 "    Leader-to - Apply one hint at cursor position

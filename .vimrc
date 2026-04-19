@@ -111,6 +111,9 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
     else
         " This looks nices where ever I run unix'ish OS's
 "       set guifont=-adobe-courier-medium-r-normal--12-120-75-75-m-70-iso8859-1
+        if !isdirectory(expand('~/.tmp'))
+          call mkdir(expand('~/.tmp'), 'p')
+        endif
         set backupdir=~/.tmp
         set dir=~/.tmp
     endif

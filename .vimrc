@@ -2,6 +2,7 @@
 " vimrc - This file will be used for both vim and gvim ( unix + win32 )
 "-------------------------------------------------------------------------------
 " Only do this for Vim version 5.0 and later.
+set nocompatible        " Don't try to be VI - must come first
 if version >= 500
 hi Statement  cterm=bold ctermfg=Red        gui=bold guifg=blue
 hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
@@ -10,27 +11,29 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
     
 
     set mousehide           " Hide the mouse pointer while typing
-    set nocompatible        " Don't try to be VI
     set cindent             " 'c' indenting - good for perl and java too
     set shiftwidth=4        " shift width - studies say 4 is easiest to read
     set tabstop=4           " tab stop - studies say 4 is easiest to read
     set laststatus=2        " laststatus - status bar along the bottom
     set ruler               " This is the cursor location in statusbar
     set ignorecase          " Ignores case in text searches
+    set smartcase           " case-sensitive when uppercase is typed
     set hlsearch            " Switch on search pattern highlighting.
     set incsearch           " Highlight search as you type
     set visualbell          " turns off the mind bending 'binging'
 
-    autocmd Filetype ruby setlocal ts=2 sts=2 sw=2 expandtab
-    autocmd Filetype coffee setlocal ts=2 sts=2 sw=2 expandtab
-    autocmd Filetype haml setlocal ts=2 sts=2 sw=2 expandtab
-    autocmd Filetype elm setlocal ts=2 sts=2 sw=2 expandtab
-    autocmd Filetype haskell setlocal ts=2 sts=2 sw=2 expandtab  commentstring=--\ %s
-    autocmd Filetype python setlocal ts=2 sts=2 sw=2 expandtab
-    autocmd FileType javascript setlocal commentstring=//\ %s
+    augroup filetype_settings
+      autocmd!
+      autocmd Filetype ruby setlocal ts=2 sts=2 sw=2 expandtab
+      autocmd Filetype coffee setlocal ts=2 sts=2 sw=2 expandtab
+      autocmd Filetype haml setlocal ts=2 sts=2 sw=2 expandtab
+      autocmd Filetype elm setlocal ts=2 sts=2 sw=2 expandtab
+      autocmd Filetype haskell setlocal ts=2 sts=2 sw=2 expandtab  commentstring=--\ %s
+      autocmd Filetype python setlocal ts=2 sts=2 sw=2 expandtab
+      autocmd FileType javascript setlocal commentstring=//\ %s
+      autocmd FileType typescript setlocal formatprg=prettier\ --parser\ typescript
+    augroup END
 
-    autocmd FileType typescript setlocal formatprg=prettier\ --parser\ typescript
-    
     set expandtab " lets just make this the default
 
     nmap <C-S-V> "+gP
@@ -78,8 +81,14 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
         imap <S-Insert> <ESC><C-S-V>a
         vmap <C-Insert> "*y
 
+        " copies to system clipboard (WSL only)
+        if executable('clip.exe')
+            vmap <C-Insert> :w !clip.exe<CR>
+        endif
     endif
 
+    " Control / to clear last search
+    noremap <silent> <c-_> :let @/ = ""<CR>
 
     " Map Ctrl-W to leader w 
     nnoremap <Leader>w <C-w>
@@ -99,6 +108,7 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
     " Win32 - put Win32 specific "stuff" here.
     "---------------------------------------------------------------------------
     if has("win32")
+        set ssl
         " Fixedsys 10pt looks nice on all the windows computers I use
         set guifont=Fixedsys:h10
         set fileformat=unix     " fileformat = ff is the cr/lf issue.
@@ -131,7 +141,6 @@ hi Type       cterm=NONE ctermfg=Red        gui=bold guifg=blue
 ""   set shellredir=>%s\ 2>&1
 "   set shellredir=">%s 2>&1"
 "   set shellxquote=\"
-   set ssl
 
 
 endif
@@ -140,46 +149,54 @@ endif
 " Sourse the .exrc "Mappings"
 " :source ~/.exrc
 set nowrap
-set runtimepath^=~/.vim/bundle/node
-set runtimepath^=~/.vim/bundle/vim-nodejs-errorformat
 
 set number " line numbers
-if &term =~ '^xterm'
-  " solid underscore
-  let &t_SI .= "\<Esc>[5 q"
-  " solid block
-  let &t_EI .= "\<Esc>[1 q"
-  " 1 or 0 -> blinking block
-  " 3 -> blinking underscore
-  " Recent versions of xterm (282 or above) also support
-  " 5 -> blinking vertical bar
-  " 6 -> solid vertical bar
-  "autocmd VimLeave * silent !echo -ne "\033[0 q"
-endif
 
-if &term =~ '^xterm'
-    " normal mode
-    let &t_EI .= "\<Esc>[0 q"
-    " insert mode
-    let &t_SI .= "\<Esc>[5 q"
-endif
-
+set splitbelow " default for sp will be to open the split below
+set splitright " default for vs will be to open the split to the right
 
 if exists('$TMUX')
-"    " tmux will only forward escape sequences to the terminal if surrounded by a DCS sequence
+   " tmux will only forward escape sequences to the terminal if surrounded by a DCS sequence
    let &t_SI .= "\<Esc>Ptmux;\<Esc>\<Esc>[5 q\<Esc>\\"
    let &t_EI .= "\<Esc>Ptmux;\<Esc>\<Esc>[0 q\<Esc>\\"
    autocmd VimLeave * silent !echo -ne "\033Ptmux;\033\033[0 q\033\\"
-endi
+
+   nnoremap <C-p> "+p
+
+   " copies to system clipboard (WSL only)
+   if executable('clip.exe')
+      "vmap <C-Insert> :w !clip.exe<CR>
+      vmap <C-Insert> :'<,'>w !clip.exe<CR>
+      vnoremap <C-y> :'<,'>w !clip.exe<CR>
+
+      " copy selection to tmux buffer
+      "vnoremap <leader>tc y<cr>:call system("tmux load-buffer -", @0)<cr>gv
+      "nnoremap <leader>tp :let @0 = system("tmux save-buffer -")<cr>"0p<cr>g;
+      vnoremap  <leader>tc :w !clip.exe<CR>
+   endif
+endif
+
+" this is stupid hack for windows terminal (cursors) - idk if it is colbbering the thing above for tmux but
+" it seems to work in both. gd annoying though
+" https://github.com/microsoft/terminal/issues/68#issuecomment-596166837
+if &term == 'win32'
+        let &t_ti.=" \e[1 q"
+        let &t_SI.=" \e[5 q-- INSERT --"
+        let &t_EI.=" \e[1 q"
+        let &t_te.=" \e[0 q"
+else
+        let &t_ti.="\e[1 q"
+        let &t_SI.="\e[5 q"
+        let &t_EI.="\e[1 q"
+        let &t_te.="\e[0 q"
+endif
+
 
 " Shortcut to rapidly toggle `set list`
    nmap <leader>l :set list!<CR>
 
-" Use the same symbols as TextMate for tabstops and EOLs
-set listchars=tab:?\ ,eol:�
-set lcs+=space:� " works with listchars
 
-" testing
+" Use the same symbols as TextMate for tabstops and EOLs
 set encoding=utf-8
 set listchars=tab:▸\ ,eol:¬,space:·,trail:·
 
@@ -211,7 +228,25 @@ function! SummarizeTabs()
     echohl None
   endtry
 endfunction
-execute pathogen#infect()
 
+"    Haskell hlint reformatting
 "    Leader-to - Apply one hint at cursor position
 "    Leader-ta - Apply all suggestions in the file
+
+call plug#begin('~/.vim/plugged')
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'mpickering/hlint-refactor-vim'
+Plug 'tpope/vim-commentary'
+call plug#end()
+
+" used by the coc <TAB> mapping below
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"

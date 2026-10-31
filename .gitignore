@@ -1,0 +1,12 @@
+# Plugins are installed by plugin managers, not stored in this repo
+.vim/plugged/
+.vim/bundle/
+.vim/pack/
+.tmux/plugins/
+
+# Old Windows copy of .vim
+.vim/vimfiles/
+
+# Per-machine vim state
+.vim/views/
+.vim/.netrwhist

@@ -43,7 +43,7 @@ esac
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
-force_color_prompt=yes
+#force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
@@ -111,20 +111,32 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-# WSL (Windows Subsystem for Linux) specific settings.
-if grep -qE "(Microsoft|WSL)" /proc/version &>/dev/null; then
-    # Adjustments for WSL's file / folder permission metadata.
-    if [ "$(umask)" = "0000" ]; then
-      umask 0022
-    fi
 
-    # Access local X-server with VcXsrv.
-    #   Requires: https://sourceforge.net/projects/vcxsrv/ (or alternative)
-    export DISPLAY=:0
 
-    # Configure the Docker CLI to use the Docker for Windows daemon.
-    #   Requires: https://docs.docker.com/docker-for-windows/install/
-    export DOCKER_HOST=tcp://localhost:2375
+[ -f ~/.fancy-git/prompt.sh ] && . ~/.fancy-git/prompt.sh
+
+export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
+
+[ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
+export PATH="$HOME/.local/bin:$PATH"
+# fnm
+FNM_PATH="$HOME/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="$FNM_PATH:$PATH"
+  eval "$(fnm env --shell bash)"
 fi
-export GITAWAREPROMPT=~/.bash/git-aware-prompt
-source "${GITAWAREPROMPT}/main.sh"
+
+# Run the current stack project's test suite under ghcid (reloads on save)
+stacktest() {
+    local cabal proj
+    cabal=$(compgen -G '*.cabal' | head -n 1)
+    if [ -z "$cabal" ]; then
+        echo "stacktest: no .cabal file in $(pwd)" >&2
+        return 1
+    fi
+    proj=${cabal%.cabal}
+    ghcid --command "stack ghci ${proj} --test --main-is ${proj}:${proj}-test" --test 'main' --warning
+}
+
+# Machine-specific settings (not in the dotfiles repo) go in ~/.bashrc.local
+[ -f ~/.bashrc.local ] && . ~/.bashrc.local
